@@ -1,0 +1,26 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+
+export default defineConfig({
+  base: '/MiniAlchemy/',
+  plugins: [
+    react(),
+    {
+      name: 'unity-fix',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url?.endsWith('.gz')) {
+            res.setHeader('Content-Encoding', 'gzip');
+            
+            if (req.url.endsWith('.js.gz')) {
+              res.setHeader('Content-Type', 'application/javascript');
+            } else if (req.url.endsWith('.wasm.gz')) {
+              res.setHeader('Content-Type', 'application/wasm');
+            }
+          }
+          next();
+        });
+      },
+    },
+  ],
+})
